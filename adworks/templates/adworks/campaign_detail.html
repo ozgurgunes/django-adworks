@@ -1,0 +1,31 @@
+{% extends "adworks/base.html" %}
+{% block title %}{{ campaign.title }} ({{ campaign.client.title }}) - {{ block.super }}{% endblock %}
+
+{% block nav %}
+<a href="{% url client_detail campaign.client.slug campaign.client.token %}">{{campaign.client.title}}</a> > {{ campaign.title }}
+{% endblock %}
+
+{% block content %}
+<div class="main section">
+	<h2>{{ campaign.title }}</h2>
+	<p>{{ campaign.summary }}</p>
+	{% if campaign.mediaplan %}
+	<p><a href="{{MEDIA_URL}}/{{ campaign.mediaplan }}">{% trans "Media planını indir" %}</a></p>	
+	{% endif %}	
+</div>
+<div class="side section">
+	<h3>{% trans "Bannerlar" %}</h3>
+	{% if banners %}
+	<ul>
+	{% for item in banners %}
+		<li>
+			<h4><a href="{{item.get_absolute_url}}">{{ item }}</a></h4>
+			<p>{{ item.description }}</p>
+		</li>
+	{% endfor %}
+	</ul>
+	{% else %}
+	<p>{% trans "Bu kampanya için kayıtlı banner bulunmuyor." %}</p>
+	{% endif %}	
+</div>
+{% endblock %}

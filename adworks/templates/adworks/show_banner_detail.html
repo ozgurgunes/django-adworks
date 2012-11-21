@@ -1,0 +1,43 @@
+{% extends "adworks/base.html" %}
+{% block title %}{{ banner }} - {{ block.super }}{% endblock %}
+
+{% block nav %}
+<a href="{% url client_detail banner.client.slug banner.client.token %}">{{banner.client}}</a> &gt;
+<a href="{% url campaign_detail banner.client.slug banner.campaign.slug banner.campaign.token %}">{{ banner.campaign }}</a> &gt;
+<a href="{{ banner.get_absolute_url }}">{{ banner }}</a> &gt;
+{{ version }}
+{% endblock %}
+
+{% block content %}
+<div class="main section">
+	<h2>{{ banner }} / {{ version }}</h2>
+
+	<div class="bannercontainer">
+		<p id="bannerfile">{% trans "Flash Player güncellemesi gerekiyor." %}</p>
+	</div>
+	<script type="text/javascript" charset="utf-8">
+		<!--//--><![CDATA[//><!--
+
+	swfobject.embedSWF("{{MEDIA_URL}}{{ version.file }}?clickTAG={{ version.get_absolute_url }}", "bannerfile", "{{ version.banner.size.width }}", "{{ version.banner.size.height }}", "9.0.0", "expressInstall.swf", {}, {wmode: "opaque"},{});
+
+		//--><!]]>
+		</script>
+
+		<p>{{ banner.description }}</p>
+</div>
+<div class="side section">
+	<h3>{% trans "Versiyonlar" %}</h3>
+		{% if versions %}
+			<ul>
+			{% for item in versions %}
+				<li>
+					<h4><a href="{{ item.get_absolute_url }}">{{ item }}</a> {% ifequal item version %}({% trans "Gösteriliyor" %}){% endifequal %}</h4>
+					<p>{{ item.comment }}</p>
+				</li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>{% trans "Bu banner için kayıtlı versiyon bulunmuyor." %}</p>
+		{% endif %}
+</div>	
+{% endblock %}

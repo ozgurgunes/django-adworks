@@ -1,0 +1,33 @@
+{% extends "adworks/base.html" %}
+{% block title %}{{ client.title }} - {{ block.super }}{% endblock %}
+
+{% block nav %}
+{{ client.title }}
+{% endblock %}
+
+{% block content %}
+<div class="main section">
+	{% if client.logo %}
+	<div class="left">
+		<img src="{{ MEDIA_URL }}/{{ client.logo }}" width="96" border="0" alt="{{ client.title }}" />
+	</div>
+	{% endif %}
+	<h2>{{ client.title }}</h2>
+	<p><a href="{{ client.website }}">{{ client.website }}</a></p>
+</div>
+<div class="side section">
+	<h3>{% trans "Kampanyalar" %}</h3>
+	{% if campaigns %}
+		<ul>
+		{% for item in campaigns %}
+	   		<li>
+				<h4><a href="{% url campaign_detail client.slug item.slug item.token %}">{{ item.title }}</a> ({{ item.banner_set.count }} banner)</h4>
+				<p>{{ item.summary }}</p>
+			</li>
+		{% endfor %}		
+		</ul>
+	{% else %}
+		<p>{% trans "Bu müşteri için kayıtlı kampanya bulunmuyor." %}</p>
+	{% endif %}	
+</div>
+{% endblock %}
