@@ -1,42 +1,74 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from adworks.models import *
+from adworks.models import (Client, Campaign, Dimension, 
+                                Attribute, Banner, Version)
+
+
+def smart_truncate(content, length=100, suffix='...'):
+    if len(str(content)) <= length:
+        return content
+    else:
+        return content[:length].rsplit(' ', 1)[0]+suffix
+
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display  = ('title', 'website', 'created_date')
+    def campaign_count(self, instance):
+        return instance.campaign_set.count()
+
+    list_display  = ('title', 'website', 'campaign_count')
     search_fields = ('title', 'about')
     prepopulated_fields = {'slug': ('title',)}
-    fieldsets = [
-      (None,                {'fields':  ['title', 'slug', 'about', 'website', 'logo']}),
-    ]
-admin.site.register(Client, ClientAdmin)
+    fields = ('title', 'slug', 'logo', 'website', 'about')
+    
 
 class CampaignAdmin(admin.ModelAdmin):
-    list_display  = ('title', 'client', 'created_date')
-    list_filter   = ('client',)
+    def banner_count(self, instance):
+        return instance.banner_set.count()
+
+    list_display  = ('title', 'client', 'banner_count')
+    list_filter   = ('client__title',)
     search_fields = ('title', 'summary', 'client')
     prepopulated_fields = {'slug': ('title',)}
-    fieldsets = [
-      (None,                {'fields':  ['client', 'title', 'slug', 'summary', 'mediaplan']}),
-    ]
-admin.site.register(Campaign, CampaignAdmin)
+    fields = ('client', 'title', 'slug', 'summary', 'mediaplan')
+
 
 class VersionInline(admin.StackedInline):
     model=Version
     extra=1
 
+
 class BannerAdmin(admin.ModelAdmin):
-    list_display  = ('size', 'campaign')	
-    list_filter   = ('size', 'campaign')
+    def version_count(self, instance):
+        return instance.version_set.count()
+
+    list_display  = ('dimension', 'attribute', 'campaign', 'version_count')	
+    list_filter   = ('dimension__width', 'dimension__height', 
+                        'attribute__title', 'campaign__title', 'campaign__client__title')
     search_fields = ('description',)
-    fieldsets = [
-      (None,                {'fields':  ['campaign', 'size', 'description']}),
-    ]
+    fields = ('campaign', ('dimension', 'attribute'), 'description')
     inlines         = [VersionInline,]
 
-admin.site.register(Banner, BannerAdmin)
 
-class SizeAdmin(admin.ModelAdmin):
-    list_display  = ('width', 'height', 'attribute')	
-    list_filter   = ('attribute',)
-admin.site.register(Size, SizeAdmin)
+class AttributeAdmin(admin.ModelAdmin):    
+    def summary(self, instance):
+        return smart_truncate(instance.description)
+        
+    list_display  = ('title', 'summary')
+
+
+class DimensionAdmin(admin.ModelAdmin):
+    def dimension(self, instance):
+        return u'%sx%s px' % (instance.width, instance.height)
+
+    def summary(self, instance):
+        return smart_truncate(instance.description)
+        
+    list_display  = ('dimension', 'summary')
+    list_filter   = ('width', 'height')
+
+
+admin.site.register(Client, ClientAdmin)
+admin.site.register(Campaign, CampaignAdmin)
+admin.site.register(Banner, BannerAdmin)
+admin.site.register(Dimension, DimensionAdmin)
+admin.site.register(Attribute, AttributeAdmin)

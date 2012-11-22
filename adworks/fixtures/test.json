@@ -1,0 +1,127 @@
+[
+{
+    "pk": 1, 
+    "model": "sites.site", 
+    "fields": 
+    {
+        "domain": "localhost:8000", 
+        "name": "Example Site"
+    }
+},
+{
+    "pk": 1, 
+    "model": "auth.user", 
+    "fields": 
+    {
+        "username": "admin", 
+        "first_name": "Admin", 
+        "last_name": "User", 
+        "is_active": true, 
+        "is_superuser": true, 
+        "is_staff": true, 
+        "last_login": "2012-01-01 00:00:00", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "sha1$e467e$508942f1c9be858fd46dc976c2496ba133ba4122", 
+        "email": "admin@example.com", 
+        "date_joined": "2012-01-01 00:00:00"
+    }
+}, 
+{
+    "pk": 2, 
+    "model": "auth.user", 
+    "fields": 
+    {
+        "username": "test", 
+        "first_name": "Test", 
+        "last_name": "User", 
+        "is_active": true, 
+        "is_superuser": true, 
+        "is_staff": false, 
+        "last_login": "2012-01-01 00:00:00", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "sha1$3cb32$046d34b6eee347cb4ce099b266f1b9b3d066553a", 
+        "email": "test@example.com",
+        "date_joined": "2012-01-01 00:00:00"
+    }
+}, 
+{
+    "pk": 3, 
+    "model": "auth.user", 
+    "fields": 
+    {
+        "username": "demo", 
+        "first_name": "Demo", 
+        "last_name": "User", 
+        "is_active": true, 
+        "is_superuser": false, 
+        "is_staff": false, 
+        "last_login": "2012-01-01 00:00:00", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "sha1$1e2d3$0fd3f38117e48024ad68058252c42e9b9d69ca43", 
+        "email": "demo@example.com",
+        "date_joined": "2012-01-01 00:00:00"
+    }
+}, 
+{
+    "pk": 1,
+    "model": "adworks.client",
+    "fields": 
+    {
+        "title": "Acme Corp",
+        "slug": "acme-corp",
+		"token": "7c879ad6a7611d94b34c1911910257c9"
+    }
+},
+{
+    "pk": 1,
+    "model": "adworks.campaign",
+    "fields": 
+    {
+		"client": 1,
+        "title": "Campaign 1",
+        "slug": "campaign-1",
+		"token": "8216b7b37bbeef046f576d2c076058c2"
+    }
+},
+{
+    "pk": 1,
+    "model": "adworks.dimension",
+    "fields": 
+    {
+        "width": 300,
+        "height": 200
+     }
+},
+{
+    "pk": 1, 
+    "model": "adworks.attribute", 
+    "fields": 
+    {
+        "title": "Normal"
+    }
+},
+{
+    "pk": 1, 
+    "model": "adworks.banner", 
+    "fields": 
+    {
+        "campaign": 1, 
+        "dimension": 1, 
+        "attribute": 1,
+		"token": "6a42f69d58e6232d44aa73fce282ac1a"
+    }
+},
+{
+    "pk": 1, 
+    "model": "adworks.version", 
+    "fields": 
+    {
+        "banner": 1, 
+        "revision": 1,
+		"created_date": "2012-01-01T00:00:00"
+    }
+}
+]

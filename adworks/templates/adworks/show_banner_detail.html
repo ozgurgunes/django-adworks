@@ -1,16 +1,17 @@
 {% extends "adworks/base.html" %}
 {% block title %}{{ banner }} - {{ block.super }}{% endblock %}
 
-{% block nav %}
-<a href="{% url client_detail banner.client.slug banner.client.token %}">{{banner.client}}</a> &gt;
-<a href="{% url campaign_detail banner.client.slug banner.campaign.slug banner.campaign.token %}">{{ banner.campaign }}</a> &gt;
-<a href="{{ banner.get_absolute_url }}">{{ banner }}</a> &gt;
-{{ version }}
-{% endblock %}
-
 {% block content %}
-<div class="main section">
-	<h2>{{ banner }} / {{ version }}</h2>
+<script src="{{ STATIC_URL }}/js/swfobject.js" type="text/javascript" charset="utf-8"></script>
+<ul class="breadcrumb">
+	<li><a href="{% url client_detail banner.client.slug banner.client.token %}">{{banner.client}}</a> <span class="divider">/</span></li>
+	<li><a href="{% url campaign_detail banner.client.slug banner.campaign.slug banner.campaign.token %}">{{ banner.campaign }}</a> <span class="divider">/</span></li>
+	<li><a href="{{ banner.get_absolute_url }}">{{ banner }}</a> <span class="divider">/</span></li>
+	<li>{{ version }}</li>
+</ul>
+
+<section>
+	<h1 class="page-header">{{ banner }} ({{ version }})</h1>
 
 	<div class="bannercontainer">
 		<p id="bannerfile">{% trans "Flash Player güncellemesi gerekiyor." %}</p>
@@ -18,14 +19,15 @@
 	<script type="text/javascript" charset="utf-8">
 		<!--//--><![CDATA[//><!--
 
-	swfobject.embedSWF("{{MEDIA_URL}}{{ version.file }}?clickTAG={{ version.get_absolute_url }}", "bannerfile", "{{ version.banner.size.width }}", "{{ version.banner.size.height }}", "9.0.0", "expressInstall.swf", {}, {wmode: "opaque"},{});
+	swfobject.embedSWF("{{MEDIA_URL}}{{ version.file }}?clickTAG={{ version.get_absolute_url }}", "bannerfile", "{{ version.banner.dimension.width }}", "{{ version.banner.dimension.height }}", "9.0.0", "expressInstall.swf", {}, {wmode: "opaque"},{});
 
 		//--><!]]>
 		</script>
-
-		<p>{{ banner.description }}</p>
-</div>
-<div class="side section">
+		{% if banner.description %}
+	<div>{{ banner.description|linebreaks }}</div>
+		{% endif %}
+</section>
+<section>
 	<h3>{% trans "Versiyonlar" %}</h3>
 		{% if versions %}
 			<ul>
@@ -39,5 +41,5 @@
 		{% else %}
 			<p>{% trans "Bu banner için kayıtlı versiyon bulunmuyor." %}</p>
 		{% endif %}
-</div>	
+</section>
 {% endblock %}

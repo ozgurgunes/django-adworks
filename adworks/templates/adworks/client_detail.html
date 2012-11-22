@@ -1,11 +1,10 @@
 {% extends "adworks/base.html" %}
 {% block title %}{{ client.title }} - {{ block.super }}{% endblock %}
 
-{% block nav %}
-{{ client.title }}
-{% endblock %}
-
 {% block content %}
+<ul class="breadcrumb">
+	<li>{{ client.title }}</li>
+</ul>
 <div class="main section">
 	{% if client.logo %}
 	<div class="left">

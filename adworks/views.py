@@ -29,7 +29,7 @@ def campaign_detail(request,client,campaign,token):
 		return render_to_response('error.html')
 
 def banner_detail(request,client,campaign,id,token):
-	banner=Banner.objects.all().get(id=id)
+	banner=Banner.objects.get(id=id)
 	versions=banner.version_set.all().order_by('-revision')
 	version = versions[0]
 	extra_context = {
@@ -43,7 +43,7 @@ def banner_detail(request,client,campaign,id,token):
 		return render_to_response('error.html')
 
 def banner_version(request,client,campaign,id,token,revision):
-	banner=Banner.objects.all().get(id=id)
+	banner=Banner.objects.get(id=id)
 	versions=banner.version_set.all().order_by('-revision')
 	version=versions.get(revision=revision)
 	extra_context = {
