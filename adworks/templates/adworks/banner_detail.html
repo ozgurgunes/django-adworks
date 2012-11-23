@@ -4,8 +4,8 @@
 {% block content %}
 <script src="{{ STATIC_URL }}/js/swfobject.js" type="text/javascript" charset="utf-8"></script>
 <ul class="breadcrumb">
-	<li><a href="{% url client_detail banner.client.slug banner.client.token %}">{{banner.client}}</a> <span class="divider">/</span></li>
-	<li><a href="{% url campaign_detail banner.client.slug banner.campaign.slug banner.campaign.token %}">{{ banner.campaign }}</a> <span class="divider">/</span></li>
+	<li><a href="{{ banner.client.get_absolute_url }}">{{banner.client}}</a> <span class="divider">/</span></li>
+	<li><a href="{{ banner.campaign.get_absolute_url }}">{{ banner.campaign }}</a> <span class="divider">/</span></li>
 	<li><a href="{{ banner.get_absolute_url }}">{{ banner }}</a> <span class="divider">/</span></li>
 	<li>{{ version }}</li>
 </ul>
@@ -13,8 +13,10 @@
 <section>
 	<h1 class="page-header">{{ banner }} ({{ version }})</h1>
 
-	<div class="bannercontainer">
-		<p id="bannerfile">{% trans "Flash Player güncellemesi gerekiyor." %}</p>
+	<div class="bannercontainer" align="center">
+		<p id="bannerfile">{% trans "Please update your flash player." %}</p>
+		<p> </p>
+		<a href="{{ version.file.url }}" class="btn btn-primary">{% trans "Download file" %}</a>
 	</div>
 	<script type="text/javascript" charset="utf-8">
 		<!--//--><![CDATA[//><!--
@@ -23,23 +25,21 @@
 
 		//--><!]]>
 		</script>
-		{% if banner.description %}
-	<div>{{ banner.description|linebreaks }}</div>
-		{% endif %}
+	<div>{{ banner.description|linebreaks|safe }}</div>
 </section>
 <section>
-	<h3>{% trans "Versiyonlar" %}</h3>
-		{% if versions %}
+	<h3>{% trans "Versions" %}</h3>
+		{% if banner.version_set.all %}
 			<ul>
-			{% for item in versions %}
+			{% for item in banner.version_set.all %}
 				<li>
 					<h4><a href="{{ item.get_absolute_url }}">{{ item }}</a> {% ifequal item version %}({% trans "Gösteriliyor" %}){% endifequal %}</h4>
-					<p>{{ item.comment }}</p>
+					<div>{{ item.note|linebreaks|safe }}</div>
 				</li>
 			{% endfor %}
 			</ul>
 		{% else %}
-			<p>{% trans "Bu banner için kayıtlı versiyon bulunmuyor." %}</p>
+			<p>{% trans "No version found for this banner." %}</p>
 		{% endif %}
 </section>
 {% endblock %}

@@ -3,29 +3,29 @@
 
 {% block content %}
 <ul class="breadcrumb">
-	<li><a href="{% url client_detail campaign.client.slug campaign.client.token %}">{{campaign.client.title}}</a> <span class="divider">></span></li> 
+	<li><a href="{{ campaign.client.get_absolute_url }}">{{campaign.client.title}}</a> <span class="divider">/</span></li> 
 	<li>{{ campaign.title }}</li>
 </ul>
-<div class="main section">
-	<h2>{{ campaign.title }}</h2>
-	<p>{{ campaign.summary }}</p>
+<section class="main section">
+	<h1 class="page-header">{{ campaign.title }}</h1>
+	<div>{{ campaign.summary|linebreaks|safe }}</div>
 	{% if campaign.mediaplan %}
-	<p><a href="{{MEDIA_URL}}/{{ campaign.mediaplan }}">{% trans "Download media plan" %}</a></p>	
+	<p><a href="{{MEDIA_URL}}/{{ campaign.mediaplan }}">{% trans "Download file" %}</a></p>	
 	{% endif %}	
-</div>
-<div class="side section">
+</section>
+<section>
 	<h3>{% trans "Banners" %}</h3>
-	{% if banners %}
+	{% if campaign.banner_set.all %}
 	<ul>
-	{% for item in banners %}
+	{% for item in campaign.banner_set.all %}
 		<li>
 			<h4><a href="{{item.get_absolute_url}}">{{ item }}</a></h4>
-			<p>{{ item.description }}</p>
+			<div>{{ item.description|linebreaks|safe }}</div>
 		</li>
 	{% endfor %}
 	</ul>
 	{% else %}
-	<p>{% trans "Bu kampanya için kayıtlı banner bulunmuyor." %}</p>
+	<p>{% trans "No banner found for this campaign." %}</p>
 	{% endif %}	
-</div>
+</section>
 {% endblock %}

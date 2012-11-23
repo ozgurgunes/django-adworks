@@ -21,7 +21,7 @@ class ClientModelTest(AdworksTestCase):
         filename = 'logo.png'
         path = get_upload_to(client, filename)
         self.failIfEqual(filename, path)
-        FILE_RE = re.compile('^%(filepath)s/[a-f0-9]{5}.png$' %
+        FILE_RE = re.compile('^%(filepath)s/logo.png$' %
                             {'filepath': '%s/%s' % (
                                     str(client._meta.app_label), 
                                     str(client._meta.module_name))})
@@ -41,7 +41,7 @@ class CampaignModelTest(AdworksTestCase):
         filename = 'mediaplan.xls'
         path = get_upload_to(campaign, filename)
         self.failIfEqual(filename, path)
-        FILE_RE = re.compile('^%s/%s/[a-f0-9]{10}.xls$' % (
+        FILE_RE = re.compile('^%s/%s/mediaplan.xls$' % (
                                     str(campaign._meta.app_label), 
                                     str(campaign._meta.module_name)))
         self.failUnless(FILE_RE.search(path))
@@ -50,23 +50,42 @@ class CampaignModelTest(AdworksTestCase):
 class DimensionModelTest(AdworksTestCase):
     
     def test_stringification(self):
-        pass
+        dimension = Dimension.objects.get(pk=1)
+        self.failUnlessEqual(dimension.__unicode__(), 
+                '%sx%s' % (dimension.width, dimension.height))
 
 
 class AttributeModelTest(AdworksTestCase):
     
     def test_stringification(self):
-        pass
+        attribute = Attribute.objects.get(pk=1)
+        self.failUnlessEqual(attribute.__unicode__(), '%s' % attribute.title)
 
 
 class BannerModelTest(AdworksTestCase):
     
     def test_stringification(self):
-        pass
+        banner = Banner.objects.get(pk=1)
+        self.failUnlessEqual(banner.__unicode__(), 
+                '%s - %s' % (banner.dimension, banner.attribute))
 
 
 class VersionModelTest(AdworksTestCase):
     
     def test_stringification(self):
-        pass
+        version = Version.objects.get(pk=1)
+        self.failUnlessEqual(version.__unicode__(), 
+                'Revision: %s' % version.revision)
+                
+    def test_upload_file(self):
+        version = Version.objects.get(pk=1)
+        filename = 'banner.swf'
+        path = get_upload_to(version, filename)
+        self.failIfEqual(filename, path)
+        FILE_RE = re.compile('^%(filepath)s/banner.swf$' %
+                            {'filepath': '%s/%s' % (
+                                    str(client._meta.app_label), 
+                                    str(client._meta.module_name))})
 
+        self.failUnless(FILE_RE.search(path))
+        

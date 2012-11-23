@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import re
-from hashlib import md5
-from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.template import defaultfilters
+
+from uuidfield import UUIDField
 
 
 def get_upload_to(instance, filename):
@@ -13,24 +14,13 @@ def get_upload_to(instance, filename):
                             re.sub('[^\.0-9a-zA-Z()_-]', '_', filename))
 
 
-class TokenBase(models.Model):
-    token  = models.CharField(_(u'Token'), max_length=64, blank=False)
-
-    class Meta:
-        abstract = True
-
-    def save(self, *args, **kwargs):
-        if not self.token:
-            self.token = md5(str(datetime.now())).hexdigest()
-        return super(TokenBase, self).save(*args, **kwargs)
-
-
-class Client(TokenBase):
+class Client(models.Model):
     title           = models.CharField(_(u'Title'), max_length=100, unique=True)
     slug            = models.CharField(_(u'Slug'), max_length=100, unique=True)
     about           = models.TextField(_(u'About'), blank=True)
     website         = models.CharField(_(u'Website'), max_length=150)
     logo            = models.ImageField(_(u'Logo'), upload_to=get_upload_to, blank=True)
+    token           = UUIDField(auto=True)
 
     class Meta: 
         verbose_name = _('Client')
@@ -42,7 +32,7 @@ class Client(TokenBase):
     @models.permalink
     def get_absolute_url(self):
     	return ('client_detail',(), {
-    	    'client': self.slug,
+    	    'pk': self.pk,
             'token': self.token
         })
 
@@ -52,13 +42,14 @@ class Client(TokenBase):
     	super(Client, self).save(*args, **kwargs)
 
 		
-class Campaign(TokenBase):
+class Campaign(models.Model):
     client           = models.ForeignKey(Client)
     title            = models.CharField(_(u'Title'), max_length=100)
     slug             = models.CharField(_(u'Slug'), max_length=100)
     summary          = models.TextField(_(u'Summary'), blank=True)
     mediaplan        = models.FileField(_(u'Media plan'), 
                             upload_to=get_upload_to, blank=True)
+    token            = UUIDField(auto=True)
 	
     class Meta:
         verbose_name = _('Campaign')
@@ -70,8 +61,7 @@ class Campaign(TokenBase):
     @models.permalink
     def get_absolute_url(self):
     	return ('campaign_detail',(), {
-    	    'client': self.client.slug,
-    	    'campaign': self.slug,
+    	    'pk': self.pk,
             'token': self.token
         })
 
@@ -106,11 +96,13 @@ class Dimension(models.Model):
         return u'%sx%s' % (self.width, self.height)
 
 		
-class Banner(TokenBase):
+class Banner(models.Model):
     campaign           = models.ForeignKey(Campaign)
     dimension          = models.ForeignKey(Dimension)
     attribute          = models.ForeignKey(Attribute)
+    clicktag           = models.URLField(_('Click Tag'), blank=True)
     description        = models.TextField(_(u'Description'), blank=True)
+    token               = UUIDField(auto=True)
 	
     class Meta:
         verbose_name = _('Banner')
@@ -122,9 +114,7 @@ class Banner(TokenBase):
     @models.permalink
     def get_absolute_url(self):
     	return ('banner_detail',(), {
-    	    'client': self.campaign.client.slug,
-    	    'campaign': self.campaign.slug,
-            'id': self.id,
+            'pk': self.pk,
             'token': self.token
         })
 
@@ -134,14 +124,14 @@ class Banner(TokenBase):
    
 
 class Version(models.Model):
-    banner           = models.ForeignKey(Banner)
-    revision         = models.IntegerField(_(u'Revision'), blank=True)
-    comment          = models.TextField(_(u'Comment'), blank=True)
-    file             = models.FileField(_(u'File'), upload_to=get_upload_to, 
-                                            blank=False, null=False)
-    alternative      = models.ImageField(_(u'Alternative'), upload_to=get_upload_to, 
-                                            blank=True)
-    created_date     = models.DateTimeField(_(u'Created date'), auto_now_add=True)	
+    banner          = models.ForeignKey(Banner)
+    revision        = models.IntegerField(_(u'Revision'), blank=True)
+    note            = models.TextField(_(u'Note'), blank=True)
+    file            = models.FileField(_(u'File'), upload_to=get_upload_to, 
+                                blank=False, null=False)
+    alternative     = models.ImageField(_(u'Alternative'), upload_to=get_upload_to, 
+                                blank=True)
+    created_date    = models.DateTimeField(_(u'Created date'), auto_now_add=True)	
 	
     class Meta:
         verbose_name = _('Version')
@@ -152,10 +142,8 @@ class Version(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-    	return ('banner_version',(), {
-    	    'client': self.banner.client.slug,
-    	    'campaign': self.banner.campaign.slug,
-            'id': self.banner.id,
+    	return ('version_detail',(), {
+            'pk': self.banner.pk,
             'token': self.banner.token,
             'revision': self.revision
         })

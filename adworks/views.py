@@ -1,60 +1,63 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
-from adworks.models import *
+from django.views.generic import DetailView
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
+from adworks.models import Client, Campaign, Banner, Version
+
+class BaseDetail(DetailView):
+    slug_field = 'token'
+    slug_url_kwarg = 'token'
+    
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        # Next, try looking up by primary key.
+        pk = self.kwargs.get(self.pk_url_kwarg, None)
+        token = self.kwargs.get(self.slug_url_kwarg, None)
+
+        if pk is not None and token is not None:
+            queryset = queryset.filter(pk=pk, token=token)
+
+        # If none of those are defined, it's an error.
+        else:
+            raise AttributeError("Generic detail view %s must be called with "
+                                 "an object pk and a token both."
+                                 % self.__class__.__name__)
+
+        try:
+            # Get the single item from the filtered queryset
+            obj = queryset.get()
+        except ObjectDoesNotExist:
+            raise Http404(_("No %(verbose_name)s found matching the query") %
+                          {'verbose_name': queryset.model._meta.verbose_name})
+        return obj
 
 
-def client_detail(request,client,token):
-	client = Client.objects.get(slug=client)
-	campaigns= client.campaign_set.all()
-	extra_context = {
-        'client': client,
-	    'campaigns': campaigns,
-        }
-	if client.token==token:
-		return render_to_response('adworks/client_detail.html',extra_context,context_instance=RequestContext(request))
-	else:
-		return render_to_response('error.html')
-	
-def campaign_detail(request,client,campaign,token):
-	campaign = Campaign.objects.get(slug=campaign)
-	banners = campaign.banner_set.all()
-	extra_context = {
-        'campaign': campaign,
-	    'banners': banners
-        }
-	if campaign.token==token:
-		return render_to_response('adworks/campaign_detail.html',extra_context,context_instance=RequestContext(request))
-	else:
-		return render_to_response('error.html')
+class ClientDetail(BaseDetail):
+    model = Client
+        
 
-def banner_detail(request,client,campaign,id,token):
-	banner=Banner.objects.get(id=id)
-	versions=banner.version_set.all().order_by('-revision')
-	version = versions[0]
-	extra_context = {
-        'banner': banner,
-        'versions': versions,
-        'version': version
-        }
-	if banner.token==token:
-		return render_to_response('adworks/show_banner_detail.html',extra_context,context_instance=RequestContext(request))
-	else:
-		return render_to_response('error.html')
+class CampaignDetail(BaseDetail):
+    model = Campaign
+        
 
-def banner_version(request,client,campaign,id,token,revision):
-	banner=Banner.objects.get(id=id)
-	versions=banner.version_set.all().order_by('-revision')
-	version=versions.get(revision=revision)
-	extra_context = {
-        'banner': banner,
-        'versions': versions,
-	    'version': version
-        }
-	if banner.token==token:
-		return render_to_response('adworks/show_banner_detail.html',extra_context,context_instance=RequestContext(request))
-	else:
-		return render_to_response('error.html')
-	
-   
-	
+class BannerDetail(BaseDetail):
+    model = Banner
+    extra_context = {}
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseDetail, self).get_context_data(**kwargs)
+        versions = self.object.version_set.all().order_by('-revision') 
+        revision = self.kwargs.get('revision')
+        try:
+            if revision:
+                version = versions.get(revision=revision)
+            else:
+                version = versions[0]
+        except:
+            version = None
+        self.version = version
+        self.extra_context.update({'version': version})
+        context.update(self.extra_context)
+        return context
