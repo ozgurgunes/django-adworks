@@ -9,6 +9,7 @@ from adworks.models import (get_upload_to, Client, Campaign, Dimension,
 
 class AdworksTestCase(TestCase):
     fixtures = ['test']
+
     
 class ClientModelTest(AdworksTestCase):
         
@@ -27,7 +28,11 @@ class ClientModelTest(AdworksTestCase):
                                     str(client._meta.module_name))})
 
         self.failUnless(FILE_RE.search(path))
-
+        
+        
+    def test_token(self):
+        client = Client.objects.create(title='test client')
+        self.failUnlessEqual(len(client.token), 32)
         
 
 class CampaignModelTest(AdworksTestCase):
@@ -38,13 +43,18 @@ class CampaignModelTest(AdworksTestCase):
 
     def test_upload_mediaplan(self):
         campaign = Campaign.objects.get(pk=1)
-        filename = 'mediaplan.xls'
+        filename = 'attachment.xls'
         path = get_upload_to(campaign, filename)
         self.failIfEqual(filename, path)
-        FILE_RE = re.compile('^%s/%s/mediaplan.xls$' % (
+        FILE_RE = re.compile('^%s/%s/attachment.xls$' % (
                                     str(campaign._meta.app_label), 
                                     str(campaign._meta.module_name)))
         self.failUnless(FILE_RE.search(path))
+
+    def test_token(self):
+        client = Client.objects.create(title='test client')
+        campaign = client.campaign_set.create(title='test campaign')
+        self.failUnlessEqual(len(campaign.token), 32)
         
 
 class DimensionModelTest(AdworksTestCase):
@@ -69,8 +79,24 @@ class BannerModelTest(AdworksTestCase):
         self.failUnlessEqual(banner.__unicode__(), 
                 '%s - %s' % (banner.dimension, banner.attribute))
 
+    def test_token(self):
+        dimension = Dimension.objects.create(width=300, height=250)
+        attribute = Attribute.objects.create(title='test attribute')
+        client = Client.objects.create(title='test client')
+        campaign = client.campaign_set.create(title='test campaign')
+        banner = campaign.banner_set.create(dimension=dimension, attribute=attribute)
+        self.failUnlessEqual(len(campaign.token), 32)
+
 
 class VersionModelTest(AdworksTestCase):
+    
+    def get_form(self):
+        
+        class VersionForm(ModelForm):
+            class Meta:
+                model = Version
+            
+        return VersionForm
     
     def test_stringification(self):
         version = Version.objects.get(pk=1)
@@ -84,8 +110,12 @@ class VersionModelTest(AdworksTestCase):
         self.failIfEqual(filename, path)
         FILE_RE = re.compile('^%(filepath)s/banner.swf$' %
                             {'filepath': '%s/%s' % (
-                                    str(client._meta.app_label), 
-                                    str(client._meta.module_name))})
+                                    str(version._meta.app_label), 
+                                    str(version._meta.module_name))})
 
         self.failUnless(FILE_RE.search(path))
         
+    def test_revision(self):
+        banner = Banner.objects.get(pk=1)
+        version = banner.version_set.create()
+        self.failUnlessEqual(version.revision, 2)

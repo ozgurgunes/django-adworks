@@ -29,7 +29,7 @@ class CampaignAdmin(admin.ModelAdmin):
     list_filter   = ('client__title',)
     search_fields = ('title', 'summary', 'client')
     prepopulated_fields = {'slug': ('title',)}
-    fields = ('client', 'title', 'slug', 'summary', 'mediaplan')
+    fields = ('client', 'title', 'slug', 'summary', 'attachment')
 
 
 class VersionInline(admin.StackedInline):

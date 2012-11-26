@@ -43,13 +43,14 @@ class Client(models.Model):
 
 		
 class Campaign(models.Model):
-    client           = models.ForeignKey(Client)
-    title            = models.CharField(_(u'Title'), max_length=100)
-    slug             = models.CharField(_(u'Slug'), max_length=100)
-    summary          = models.TextField(_(u'Summary'), blank=True)
-    mediaplan        = models.FileField(_(u'Media plan'), 
-                            upload_to=get_upload_to, blank=True)
-    token            = UUIDField(auto=True)
+    client          = models.ForeignKey(Client)
+    title           = models.CharField(_(u'Title'), max_length=100)
+    slug            = models.CharField(_(u'Slug'), max_length=100)
+    summary         = models.TextField(_(u'Summary'), blank=True)
+    attachment      = models.FileField(_(u'Attachment'), 
+                                upload_to=get_upload_to, blank=True,
+                                help_text=_('Upload campaign documents (brief, media plan, etc.)'))
+    token           = UUIDField(auto=True)
 	
     class Meta:
         verbose_name = _('Campaign')
@@ -97,12 +98,12 @@ class Dimension(models.Model):
 
 		
 class Banner(models.Model):
-    campaign           = models.ForeignKey(Campaign)
-    dimension          = models.ForeignKey(Dimension)
-    attribute          = models.ForeignKey(Attribute)
-    clicktag           = models.URLField(_('Click Tag'), blank=True)
-    description        = models.TextField(_(u'Description'), blank=True)
-    token               = UUIDField(auto=True)
+    campaign        = models.ForeignKey(Campaign)
+    dimension       = models.ForeignKey(Dimension)
+    attribute       = models.ForeignKey(Attribute)
+    clicktag        = models.URLField(_('Click Tag'), blank=True)
+    description     = models.TextField(_(u'Description'), blank=True)
+    token           = UUIDField(auto=True)
 	
     class Meta:
         verbose_name = _('Banner')
@@ -128,9 +129,9 @@ class Version(models.Model):
     revision        = models.IntegerField(_(u'Revision'), blank=True)
     note            = models.TextField(_(u'Note'), blank=True)
     file            = models.FileField(_(u'File'), upload_to=get_upload_to, 
-                                blank=False, null=False)
+                                 blank=False, null=False)
     alternative     = models.ImageField(_(u'Alternative'), upload_to=get_upload_to, 
-                                blank=True)
+                                 blank=True)
     created_date    = models.DateTimeField(_(u'Created date'), auto_now_add=True)	
 	
     class Meta:

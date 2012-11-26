@@ -2,6 +2,7 @@
 from django.views.generic import DetailView
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+from django.http import Http404
 from adworks.models import Client, Campaign, Banner, Version
 
 class BaseDetail(DetailView):

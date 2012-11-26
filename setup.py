@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 # Dynamically calculate the version based on adworks.VERSION.
-VERSION = (0, 1, 0, 'alpha', 0)
+VERSION = (0, 1, 0, 'final', 0)
 
 def get_version(version=None):
     """Derives a PEP386-compliant version number from VERSION."""
@@ -37,13 +37,18 @@ setup(
     name="django-adworks",
     version=get_version(),
     description = "A simple Django application to manage ad banner design and approval processes.",
-    long_description=open("README").read(),
+    long_description=open("README.rst").read(),
+    keywords=["django", "ad", "banner", "demo"],
     author = "Ozgur Gunes",
     author_email = "o.gunes@gmail.com",
     url = "http://github.com/ozgurgunes/django-adworks/",
     packages=find_packages(),
+    install_requires=[
+        'django>=1.4',
+        'django-uuidfield>=0.4',
+    ],
     classifiers=[
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",

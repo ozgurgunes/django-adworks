@@ -1,4 +1,5 @@
 {% extends "adworks/base.html" %}
+{% load i18n %}
 {% block title %}{{ campaign.title }} ({{ campaign.client.title }}) - {{ block.super }}{% endblock %}
 
 {% block content %}
@@ -9,8 +10,8 @@
 <section class="main section">
 	<h1 class="page-header">{{ campaign.title }}</h1>
 	<div>{{ campaign.summary|linebreaks|safe }}</div>
-	{% if campaign.mediaplan %}
-	<p><a href="{{MEDIA_URL}}/{{ campaign.mediaplan }}">{% trans "Download file" %}</a></p>	
+	{% if campaign.attachment %}
+	<p><a href="{{MEDIA_URL}}/{{ campaign.attachment }}">{% trans "Download file" %}</a></p>	
 	{% endif %}	
 </section>
 <section>
